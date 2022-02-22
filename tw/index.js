@@ -150,7 +150,7 @@ var app = new Vue({
         allow: true,
         waitTime: 1,
         nowHistoryTime: 0,
-        apiUrl: "https://api.infedg.xyz",
+        apiUrl: "https://api.hego.eu.org",
         foot2show: false,
         foot2Info: {
             clanName: "",
