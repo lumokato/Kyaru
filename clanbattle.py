@@ -102,7 +102,7 @@ def stage_data():
     df.columns = ['rank', 'clan_name', 'leader_name', 'member_num', 'damage', 'lap', 'boss_id', 'remain', 'grade_rank']
     now = datetime.now()
     filename = str(now.strftime("%Y%m%d%H")) + str(int(int(now.strftime("%M"))/30)*30).zfill(2)
-    df.to_csv('server/qd/1/'+filename+'.csv')
+    df.to_csv('qd/1/'+filename+'.csv')
 
 
 if __name__ == '__main__':
