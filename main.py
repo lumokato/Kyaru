@@ -1,4 +1,4 @@
-from telegram.ext import Updater, CommandHandler
+from apscheduler.schedulers.background import BlockingScheduler
 import config as cg
 import logging
 import clanbattle
@@ -10,16 +10,6 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 
-# @run_async
-# def send_async(context, *args, **kwargs):
-#     context.bot.send_message(*args, **kwargs)
-
-
-def main():
-    bot = Updater(token=cg.TOKEN, request_kwargs={'proxy_url': cg.proxy_url}, use_context=True)
-    bot.job_queue.run_repeating(clanbattle.stage_data, 1800, first="2022-01-21 8:01:00", last="2022-02-27 23:51:00")
-    bot.start_polling()
-
-
 if __name__ == '__main__':
-    main()
+    scheduler = BlockingScheduler(timezone="Asia/Shanghai")
+    scheduler.add_job(clanbattle.stage_data, 'interval', minutes=30, start_date="2022-01-21 8:01:00", end_date="2022-02-27 23:51:00")

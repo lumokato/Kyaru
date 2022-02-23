@@ -87,7 +87,7 @@ class ClanBattle:
             return '第{}名：{}，分数：{}，当前进度：{}周目{}王，剩余血量{}/{}'.format(status['rank'], status['clan_name'], status['damage'], lap, boss_id, remaining, BOSS_LIFE_LIST[boss_id - 1])
 
 
-def stage_data(context):
+def stage_data():
     App = ClanBattle(cg.pvid, cg.puid, cg.access_key)
     # save_data = [['rank', 'clan_name', 'leader_name', 'member_num', 'damage', 'lap', 'boss_id', 'remain', 'grade_rank']]
     save_data = []
@@ -106,4 +106,4 @@ def stage_data(context):
 
 
 if __name__ == '__main__':
-    stage_data('1')
+    stage_data()
