@@ -1,5 +1,5 @@
 from pcrclient import pcrclient
-import config as cg
+# import config as cg
 import pandas as pd
 # import csv
 from datetime import datetime
@@ -23,7 +23,7 @@ def boss_status(score):
         if boss_id > 4:
             boss_id = 0
             lap += 1
-            if ptr <= 1:
+            if ptr <= 2:
                 if lap >= LAP_UPGRADE[ptr]:
                     ptr += 1
 
