@@ -1,5 +1,5 @@
 from pcrclient import pcrclient
-# import config as cg
+import config as cg
 import pandas as pd
 # import csv
 from datetime import datetime
