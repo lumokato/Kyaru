@@ -1,4 +1,4 @@
-from pcrclient import pcrclient
+from pcrclient import PCRClient
 import config as cg
 import pandas as pd
 # import csv
@@ -48,7 +48,7 @@ class ClanBattle:
     def __init__(self, viewer_id, uid, access_key):
         self.uid = uid
         self.access_key = access_key
-        self.Client = pcrclient(viewer_id)
+        self.Client = PCRClient(viewer_id)
         self.Client.login(uid, access_key)
         self.clan_id = 54
 

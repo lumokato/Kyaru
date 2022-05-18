@@ -10,5 +10,5 @@ logger = logging.getLogger(__name__)
 
 if __name__ == '__main__':
     scheduler = BlockingScheduler(timezone="Asia/Shanghai")
-    scheduler.add_job(clanbattle.stage_data, 'interval', minutes=30, start_date="2022-04-24 5:01:00", end_date="2022-04-29 23:51:00")
+    scheduler.add_job(clanbattle.stage_data, 'interval', minutes=30, start_date="2022-05-26 5:01:00", end_date="2022-05-30 23:51:00")
     scheduler.start()
