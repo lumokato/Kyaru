@@ -19,7 +19,9 @@ def move_data():
     if not os.path.exists(dir+'/qd/history/1/'):
         os.makedirs(dir+'/qd/history/1')
     if os.listdir(dir+'/qd/1'):
-        shutil.copyfile(os.path.join(dir+'/qd/1', os.listdir(dir+'/qd/1')[-1]), dir+'/qd/history/1/'+str(year)+'年'+str(int(month)-1)+'月.csv')
+        dirname = os.listdir(dir+'/qd/1')
+        dirname.sort(key=lambda x: int(x[:-4]))
+        shutil.copyfile(os.path.join(dir+'/qd/1', dirname[-1]), dir+'/qd/history/1/'+str(year)+'年'+str(int(month)-1)+'月.csv')
         shutil.move(dir+'/qd/1', dir+'/qd/history/'+year[-2:]+'-'+str(int(month)-1))
         os.makedirs(dir+'/qd/1')
 
