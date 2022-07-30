@@ -36,9 +36,9 @@ def monthly(scheduler):
 
 if __name__ == '__main__':
     scheduler = BlockingScheduler(timezone="Asia/Shanghai")
-    scheduler.add_job(monthly, 'cron', day='23', hour='18', args=[scheduler])
+    scheduler.add_job(monthly, 'cron', day='23', hour='18', args=[scheduler], max_instances=100)
     # 临时
     # move_data()
     clan_time = bilievent.time_battle_bilibili()
-    scheduler.add_job(clanbattle.stage_data, 'interval', minutes=30, start_date=clan_time[0]+datetime.timedelta(minutes=2), end_date=clan_time[1]-datetime.timedelta(minutes=28))
+    scheduler.add_job(clanbattle.stage_data, 'interval', minutes=30, start_date=clan_time[0]+datetime.timedelta(minutes=2), end_date=clan_time[1]-datetime.timedelta(minutes=28), max_instances=100)
     scheduler.start()
