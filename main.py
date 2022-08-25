@@ -26,19 +26,10 @@ def move_data():
         os.makedirs(dir+'/qd/1')
 
 
-def monthly(scheduler):
-    clan_time = bilievent.time_battle_bilibili()
-    if clan_time:
-        scheduler.add_job(move_data, 'date', run_date=clan_time[0]-datetime.timedelta(hours=5))
-        scheduler.add_job(clanbattle.stage_data, 'interval', minutes=30, start_date=clan_time[0]+datetime.timedelta(minutes=2), end_date=clan_time[1]-datetime.timedelta(minutes=28))
-        scheduler.add_job(clanbattle.stage_data, 'date', run_date=clan_time[1]+datetime.timedelta(days=7))
-
-
 if __name__ == '__main__':
     scheduler = BlockingScheduler(timezone="Asia/Shanghai")
-    scheduler.add_job(monthly, 'cron', day='23', hour='18', args=[scheduler], max_instances=100)
-    # 临时
-    # move_data()
     clan_time = bilievent.time_battle_bilibili()
-    scheduler.add_job(clanbattle.stage_data, 'interval', minutes=30, start_date=clan_time[0]+datetime.timedelta(minutes=2), end_date=clan_time[1]-datetime.timedelta(minutes=28), max_instances=100)
+    scheduler.add_job(move_data, 'date', run_date=clan_time[0]-datetime.timedelta(hours=11))
+    scheduler.add_job(clanbattle.stage_data, 'interval', minutes=30, start_date=clan_time[0]+datetime.timedelta(minutes=2), end_date=clan_time[1]+datetime.timedelta(minutes=3))
+    scheduler.add_job(clanbattle.stage_data, 'date', run_date=clan_time[1]+datetime.timedelta(days=10))
     scheduler.start()
