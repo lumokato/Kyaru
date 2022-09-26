@@ -31,5 +31,5 @@ if __name__ == '__main__':
     clan_time = bilievent.time_battle_bilibili()
     scheduler.add_job(move_data, 'date', run_date=clan_time[0]-datetime.timedelta(hours=11))
     scheduler.add_job(clanbattle.stage_data, 'interval', minutes=30, start_date=clan_time[0]+datetime.timedelta(minutes=2), end_date=clan_time[1]+datetime.timedelta(minutes=3))
-    scheduler.add_job(clanbattle.stage_data, 'date', run_date=clan_time[1]+datetime.timedelta(days=10))
+    scheduler.add_job(clanbattle.stage_data, 'date', run_date=clan_time[1]+datetime.timedelta(days=12))
     scheduler.start()
