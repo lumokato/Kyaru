@@ -95,15 +95,17 @@ class ClanBattle:
             return '第{}名：{}，分数：{}，当前进度：{}周目{}王，剩余血量{}/{}'.format(status['rank'], status['clan_name'], status['damage'], lap, boss_id, remaining, BOSS_LIFE_LIST[boss_id - 1])
 
 
-def stage_data():
+def stage_data(final=0):
     App = ClanBattle(cg.pvid, cg.puid, cg.access_key)
     # save_data = [['rank', 'clan_name', 'leader_name', 'member_num', 'damage', 'lap', 'boss_id', 'remain', 'grade_rank']]
     save_data = []
-    for page in range(30):
+    for page in range(30 if not final else 300):
         try:
             temp = App.get_page_data(page)
             for status in temp:
                 save_data.append([status['rank'], status['clan_name'], status['leader_name'], status['member_num'], status['damage'], status['lap'], status['boss_id'], status['remain'], status['grade_rank']])
+            if not temp:
+                break
         except Exception:
             continue
     df = pd.DataFrame(save_data)
@@ -114,4 +116,4 @@ def stage_data():
 
 
 if __name__ == '__main__':
-    stage_data()
+    stage_data(1)
