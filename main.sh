@@ -1,3 +1,3 @@
-sudo nohup python3 -m http.server &
-sudo nohup python3 main.py &
-sudo nohup python3 server/api.py &
+ps -ef |grep main.py |awk '{print $2}'|xargs kill -9
+nohup python3 main.py &
+
