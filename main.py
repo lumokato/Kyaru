@@ -5,6 +5,7 @@ import bilievent
 import datetime
 import os
 import shutil
+import calendar
 root = logging.getLogger()
 root.setLevel(logging.INFO)
 
@@ -28,8 +29,16 @@ def move_data():
 
 if __name__ == '__main__':
     scheduler = BlockingScheduler(timezone="Asia/Shanghai")
-    clan_time = bilievent.time_battle_bilibili()
-    scheduler.add_job(move_data, 'date', run_date=clan_time[0]-datetime.timedelta(hours=11))
-    scheduler.add_job(clanbattle.stage_data, 'interval', minutes=30, start_date=clan_time[0]+datetime.timedelta(minutes=2), end_date=clan_time[1]+datetime.timedelta(minutes=3))
-    scheduler.add_job(clanbattle.stage_data, 'date', run_date=clan_time[1]+datetime.timedelta(days=7), args=[1])
+    # clan_time = bilievent.time_battle_bilibili()
+    today = datetime.datetime.today()
+    monthdays = calendar.monthrange(today.year, today.month)
+    clan_time = bilievent.time_battle_bilibili(datetime.datetime.now())
+    if not clan_time:
+        start_time = datetime.datetime(today.year, today.month, monthdays[1]-5, 5, 0)
+    else:
+        start_time = clan_time[0]
+    end_time = datetime.datetime(today.year, today.month, monthdays[1], 0, 0)
+    scheduler.add_job(move_data, 'date', run_date=start_time-datetime.timedelta(hours=16))
+    scheduler.add_job(clanbattle.stage_data, 'interval', minutes=30, start_date=start_time+datetime.timedelta(minutes=2), end_date=end_time+datetime.timedelta(minutes=2))
+    scheduler.add_job(clanbattle.stage_data, 'date', run_date=end_time+datetime.timedelta(days=7), args=[1])
     scheduler.start()
