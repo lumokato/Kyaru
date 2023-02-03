@@ -90,6 +90,10 @@ var app = new Vue({
                     "zh-cn" : "上期",
                     "zh-tw" : "上期",
                 },
+                "bili_rank":{
+                    "zh-cn" : "对应B服排名",
+                    "zh-tw" : "对应B服排名",
+                }
             }
         },
         errorOccured: false,
