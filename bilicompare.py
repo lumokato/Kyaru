@@ -116,4 +116,5 @@ def cal_rank():
 
 
 if __name__ == '__main__':
+    data = bilipage(400)
     cal_rank()

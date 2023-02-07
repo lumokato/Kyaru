@@ -2,6 +2,7 @@ from pcrclient import PCRClient
 import config as cg
 import pandas as pd
 from datetime import datetime
+import time
 import bilicompare
 
 BOSS_LIFE_LIST = [[6000000, 8000000, 10000000, 12000000, 15000000],
@@ -96,9 +97,8 @@ class ClanBattle:
 
 
 def stage_data(final=0):
-    start_time = datetime.now()
+    # start_time = datetime.now()
     App = ClanBattle(cg.pvid, cg.puid, cg.access_key)
-    # save_data = [['rank', 'clan_name', 'leader_name', 'member_num', 'damage', 'lap', 'boss_id', 'remain', 'grade_rank']]
     save_data = []
     for page in range(30 if not final else 300):
         try:
@@ -114,20 +114,31 @@ def stage_data(final=0):
     end_time = datetime.now()
     filename = str(end_time.strftime("%Y%m%d%H")) + str(int(int(end_time.strftime("%M"))/30)*30).zfill(2)
     df.to_csv('qd/1/'+filename+'.csv')
+    # print(end_time-start_time)
     retry = 0
     page = 0
     score_list = []
-    while retry < 5 and page < 55 if not final else 500:
+    while retry < 8 and page < (55 if not final else 250):
         page_data = bilicompare.bilipage(page)
         if not page_data:
             retry += 1
+            print(page)
+            if page < 5:
+                time.sleep(30)
+            elif page > 180:
+                time.sleep(1)
+            else:
+                time.sleep(10)
             continue
         else:
             try:
                 for clan in page_data['clans']:
                     score_list.append(clan['damage'])
                 page += 1
+                # if page % 10 == 0:
+                #     print(page)
             except Exception:
+                time.sleep(10)
                 continue
     qd_score_list = df['damage'].to_list()
     rank_list = []
@@ -136,8 +147,8 @@ def stage_data(final=0):
 
     df.insert(loc=len(df.columns), column='bili_rank', value=rank_list)
     df.to_csv('qd/1/'+filename+'.csv')
-    bili_time = datetime.now()
-    print(end_time-start_time, bili_time-end_time)
+    # bili_time = datetime.now()
+    # print(end_time-start_time, bili_time-end_time)
 
 
 if __name__ == '__main__':
