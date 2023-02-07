@@ -22,23 +22,19 @@ def move_data():
     if os.listdir(dir+'/qd/1'):
         dirname = os.listdir(dir+'/qd/1')
         dirname.sort(key=lambda x: int(x[:-4]))
-        shutil.copyfile(os.path.join(dir+'/qd/1', dirname[-1]), dir+'/qd/history/1/'+str(year)+'年'+str(int(month)-1)+'月.csv')
+        shutil.copyfile(os.path.join(dir+'/qd/1', dirname[-1]), dir+'/qd/history/1/'+str(year)+'年'+str(int(month)-1).zfill(2)+'月.csv')
         shutil.move(dir+'/qd/1', dir+'/qd/history/'+year[-2:]+'-'+str(int(month)-1))
         os.makedirs(dir+'/qd/1')
 
 
 if __name__ == '__main__':
     scheduler = BlockingScheduler(timezone="Asia/Shanghai")
-    # clan_time = bilievent.time_battle_bilibili()
+    # panel里设定每月15重启main.py
     today = datetime.datetime.today()
     monthdays = calendar.monthrange(today.year, today.month)
-    clan_time = bilievent.time_battle_bilibili(datetime.datetime.now())
-    if not clan_time:
-        start_time = datetime.datetime(today.year, today.month, monthdays[1]-5, 5, 0)
-    else:
-        start_time = clan_time[0]
+    start_time = datetime.datetime(today.year, today.month, monthdays[1]-5, 5, 0)
     end_time = datetime.datetime(today.year, today.month, monthdays[1], 0, 0)
     scheduler.add_job(move_data, 'date', run_date=start_time-datetime.timedelta(hours=16))
     scheduler.add_job(clanbattle.stage_data, 'interval', minutes=30, start_date=start_time+datetime.timedelta(minutes=2), end_date=end_time+datetime.timedelta(minutes=2))
-    scheduler.add_job(clanbattle.stage_data, 'date', run_date=end_time+datetime.timedelta(days=7), args=[1])
+    scheduler.add_job(clanbattle.stage_data, 'date', run_date=end_time+datetime.timedelta(days=7.64), args=[1])
     scheduler.start()

@@ -3,6 +3,63 @@ import pickle
 import time
 import csv
 import os
+import random
+import base64
+import requests
+import json
+
+
+# 获取bili数据
+def bilipage(page):
+    with open('api.json', encoding='utf-8') as fp:
+        api_data = json.load(fp)
+    a = api_data["code_a"]
+    b = api_data["code_b"]
+    c, r, t, s = "", "", str(int(time.time())), "".join(
+        random.sample("".join([chr(x).lower() for x in range(65, 91)]), 11))
+    for i in s + t:
+        c += a[i]
+    for i in base64.b64encode(c.encode()).decode():
+        r += b[i]
+    urlroot = api_data["url"]
+    default_headers = {
+        "accept": 'application/json, text/plain, */*',
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36",
+        "Custom-Source": "KyoukaOfficial",
+        "Content-Type": "application/json",
+        "Origin": "https://kyouka.kengxxiao.com/",
+        "Sec-Ch-Ua": "Chromium",
+        "Sec-Fetch-Site": "cross-site",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Dest": "empty",
+        "Referer": "https://kyouka.kengxxiao.com/",
+        "Accept-Language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7",
+        "Accept": "application/json, text/plain, */*",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Connection": "close",
+        "x-nonce": s,
+        "x-timestamp": t,
+        "x-sign": f"SIGv1.0|{r}"
+    }
+    conn = requests.session()
+    request = {
+        "name": "",
+        "leaderName": "",
+        "minRank": 1,
+        "maxRank": 99999,
+        "score": 0,
+        "page": page,
+        "period": 0,
+        "maxPerPage": 100,
+        "fav": False,
+        "onlyRank": False
+    }
+    try:
+        resp = conn.post(url=urlroot + '/clan/rankSearch/', headers=default_headers, json=request)
+        ret = json.loads(resp.content.decode())
+        return ret["data"]
+    except Exception:
+        return False
 
 
 # 将csv格式转换为pkl格式加速加载
@@ -50,10 +107,12 @@ def cal_rank():
         qd_score_list = qd_data['damage'].to_list()
         rank_list = []
         for score in qd_score_list:
-            rank_list.append(binarySearch(score_list, 0, len(score_list)-1, score))
+            rank_list.append(binarySearch(
+                score_list, 0, len(score_list)-1, score))
 
-        qd_data.insert(loc=len(qd_data.columns), column='bili_rank', value=rank_list)
-        qd_data.to_csv('qd/history/2/' + month)
+        qd_data.insert(loc=len(qd_data.columns),
+                       column='bili_rank', value=rank_list)
+        qd_data.to_csv('qd/history/1/' + month)
 
 
 if __name__ == '__main__':

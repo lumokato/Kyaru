@@ -1,8 +1,8 @@
 from pcrclient import PCRClient
 import config as cg
 import pandas as pd
-# import csv
 from datetime import datetime
+import bilicompare
 
 BOSS_LIFE_LIST = [[6000000, 8000000, 10000000, 12000000, 15000000],
                   [6000000, 8000000, 10000000, 12000000, 15000000],
@@ -96,6 +96,7 @@ class ClanBattle:
 
 
 def stage_data(final=0):
+    start_time = datetime.now()
     App = ClanBattle(cg.pvid, cg.puid, cg.access_key)
     # save_data = [['rank', 'clan_name', 'leader_name', 'member_num', 'damage', 'lap', 'boss_id', 'remain', 'grade_rank']]
     save_data = []
@@ -110,9 +111,33 @@ def stage_data(final=0):
             continue
     df = pd.DataFrame(save_data)
     df.columns = ['rank', 'clan_name', 'leader_name', 'member_num', 'damage', 'lap', 'boss_id', 'remain', 'grade_rank']
-    now = datetime.now()
-    filename = str(now.strftime("%Y%m%d%H")) + str(int(int(now.strftime("%M"))/30)*30).zfill(2)
+    end_time = datetime.now()
+    filename = str(end_time.strftime("%Y%m%d%H")) + str(int(int(end_time.strftime("%M"))/30)*30).zfill(2)
     df.to_csv('qd/1/'+filename+'.csv')
+    retry = 0
+    page = 0
+    score_list = []
+    while retry < 5 and page < 55 if not final else 500:
+        page_data = bilicompare.bilipage(page)
+        if not page_data:
+            retry += 1
+            continue
+        else:
+            try:
+                for clan in page_data['clans']:
+                    score_list.append(clan['damage'])
+                page += 1
+            except Exception:
+                continue
+    qd_score_list = df['damage'].to_list()
+    rank_list = []
+    for score in qd_score_list:
+        rank_list.append(bilicompare.binarySearch(score_list, 0, len(score_list)-1, score))
+
+    df.insert(loc=len(df.columns), column='bili_rank', value=rank_list)
+    df.to_csv('qd/1/'+filename+'.csv')
+    bili_time = datetime.now()
+    print(end_time-start_time, bili_time-end_time)
 
 
 if __name__ == '__main__':
