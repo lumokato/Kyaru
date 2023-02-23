@@ -116,36 +116,40 @@ def stage_data(final=0):
     filename = str(end_time.strftime("%Y%m%d%H")) + str(int(int(end_time.strftime("%M"))/30)*30).zfill(2)
     df.to_csv('qd/1/'+filename+'.csv')
     # print(end_time-start_time)
-    retry = 0
-    page = 0
-    score_list = []
-    
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    
-    while retry < 8 and page < (55 if not final else 250):
-        page_data = loop.run_until_complete(bilicompare.bilipage(page))
-        if not page_data:
-            retry += 1
-            print(page)
-            if page < 5:
-                time.sleep(30)
-            elif page > 180:
-                time.sleep(1)
-            else:
-                time.sleep(10)
-            continue
-        else:
-            try:
-                for clan in page_data['clans']:
-                    score_list.append(clan['damage'])
-                page += 1
-                # if page % 10 == 0:
-                #     print(page)
-            except Exception:
-                time.sleep(10)
+    async def add_score_list(page):
+        score_list = []
+        retry = 0
+        while retry < 4:
+            page_data = await bilicompare.bilipage(page)
+            if not page_data:
+                retry += 1
+                time.sleep(5)
                 continue
-    loop.close()
+            else:
+                try:
+                    for clan in page_data:
+                        score_list.append(clan['damage'])
+                    return score_list
+                except Exception:
+                    time.sleep(5)
+                    continue
+    score_list = []
+    async def main():
+        tasks = []
+        for page in range(55 if not final else 250):
+            task = asyncio.ensure_future(add_score_list(page))
+            tasks.append(task)
+        await asyncio.gather(*tasks)
+        for i in tasks:
+            if i._result:
+                score_list.extend(i._result)
+            else:
+                score_list.extend([0]*100)
+    asyncio.run(main())
+    for i in range(len(score_list)):
+        if score_list[i] == 0 and i > 1:
+            score_list[i] = score_list[i-1]
+
     qd_score_list = df['damage'].to_list()
     rank_list = []
     for score in qd_score_list:
@@ -158,4 +162,4 @@ def stage_data(final=0):
 
 
 if __name__ == '__main__':
-    stage_data(1)
+    stage_data(0)

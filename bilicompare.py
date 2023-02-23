@@ -89,7 +89,7 @@ def binarySearch(arr, left, right, x):
     if right >= left:
         mid = int(left + (right - left)/2)
         if arr[mid] == x:
-            return mid
+            return mid + 1
         elif arr[mid] > x:
             return binarySearch(arr, mid+1, right, x)
         else:
@@ -117,8 +117,4 @@ def cal_rank():
 
 
 if __name__ == '__main__':
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    result = loop.run_until_complete(bilipage(4))
-    loop.close()
-    cal_rank()
+    print(binarySearch([10,9,8,7,6,5,4], 0, 8, 7))
