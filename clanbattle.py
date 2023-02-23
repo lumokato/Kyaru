@@ -4,6 +4,7 @@ import pandas as pd
 from datetime import datetime
 import time
 import bilicompare
+import asyncio
 
 BOSS_LIFE_LIST = [[6000000, 8000000, 10000000, 12000000, 15000000],
                   [6000000, 8000000, 10000000, 12000000, 15000000],
@@ -118,8 +119,12 @@ def stage_data(final=0):
     retry = 0
     page = 0
     score_list = []
+    
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    
     while retry < 8 and page < (55 if not final else 250):
-        page_data = bilicompare.bilipage(page)
+        page_data = loop.run_until_complete(bilicompare.bilipage(page))
         if not page_data:
             retry += 1
             print(page)
@@ -140,6 +145,7 @@ def stage_data(final=0):
             except Exception:
                 time.sleep(10)
                 continue
+    loop.close()
     qd_score_list = df['damage'].to_list()
     rank_list = []
     for score in qd_score_list:
