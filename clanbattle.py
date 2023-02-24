@@ -120,21 +120,23 @@ def stage_data(final=0):
         score_list = []
         retry = 0
         while retry < 4:
+            # print('查询'+str(page))
             page_data = await bilicompare.bilipage(page)
             if not page_data:
                 retry += 1
-                time.sleep(5)
-                continue
+                time.sleep(1)
+                # continue
             else:
                 try:
                     for clan in page_data:
                         score_list.append(clan['damage'])
                     return score_list
                 except Exception:
-                    time.sleep(5)
-                    continue
+                    retry += 1
+                    time.sleep(1)
+                    # continue
     score_list = []
-    async def main():
+    async def score_main():
         tasks = []
         for page in range(55 if not final else 250):
             task = asyncio.ensure_future(add_score_list(page))
@@ -144,11 +146,8 @@ def stage_data(final=0):
             if i._result:
                 score_list.extend(i._result)
             else:
-                score_list.extend([0]*100)
-    asyncio.run(main())
-    for i in range(len(score_list)):
-        if score_list[i] == 0 and i > 1:
-            score_list[i] = score_list[i-1]
+                score_list.extend([score_list[-1] if score_list else 0]*100)
+    asyncio.run(score_main())
 
     qd_score_list = df['damage'].to_list()
     rank_list = []
