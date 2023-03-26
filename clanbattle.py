@@ -4,6 +4,7 @@ import pandas as pd
 from datetime import datetime
 import time
 import bilicompare
+import asyncio
 
 BOSS_LIFE_LIST = [[6000000, 8000000, 10000000, 12000000, 15000000],
                   [6000000, 8000000, 10000000, 12000000, 15000000],
@@ -115,31 +116,39 @@ def stage_data(final=0):
     filename = str(end_time.strftime("%Y%m%d%H")) + str(int(int(end_time.strftime("%M"))/30)*30).zfill(2)
     # df.to_csv('qd/1/'+filename+'.csv')
     # print(end_time-start_time)
-    retry = 0
-    page = 0
-    score_list = []
-    while retry < 8 and page < (55 if not final else 250):
-        page_data = bilicompare.bilipage(page)
-        if not page_data:
-            retry += 1
-            print(page)
-            if page < 5:
-                time.sleep(30)
-            elif page > 180:
+    async def add_score_list(page):
+        score_list = []
+        retry = 0
+        while retry < 4:
+            # print('查询'+str(page))
+            page_data = await bilicompare.bilipage(page)
+            if not page_data:
+                retry += 1
                 time.sleep(1)
+                # continue
             else:
-                time.sleep(10)
-            continue
-        else:
-            try:
-                for clan in page_data['clans']:
-                    score_list.append(clan['damage'])
-                page += 1
-                # if page % 10 == 0:
-                #     print(page)
-            except Exception:
-                time.sleep(10)
-                continue
+                try:
+                    for clan in page_data:
+                        score_list.append(clan['damage'])
+                    return score_list
+                except Exception:
+                    retry += 1
+                    time.sleep(1)
+                    # continue
+    score_list = []
+    async def score_main():
+        tasks = []
+        for page in range(55 if not final else 250):
+            task = asyncio.ensure_future(add_score_list(page))
+            tasks.append(task)
+        await asyncio.gather(*tasks)
+        for i in tasks:
+            if i._result:
+                score_list.extend(i._result)
+            else:
+                score_list.extend([score_list[-1] if score_list else 0]*100)
+    asyncio.run(score_main())
+
     qd_score_list = df['damage'].to_list()
     rank_list = []
 
@@ -156,4 +165,4 @@ def stage_data(final=0):
 
 
 if __name__ == '__main__':
-    stage_data(1)
+    stage_data(0)

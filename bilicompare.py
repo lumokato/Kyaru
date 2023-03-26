@@ -5,12 +5,13 @@ import csv
 import os
 import random
 import base64
-import requests
 import json
+import aiohttp
+import asyncio
 
 
 # 获取bili数据
-def bilipage(page):
+async def bilipage(page):
     with open('api.json', encoding='utf-8') as fp:
         api_data = json.load(fp)
     a = api_data["code_a"]
@@ -23,25 +24,24 @@ def bilipage(page):
         r += b[i]
     urlroot = api_data["url"]
     default_headers = {
-        "accept": 'application/json, text/plain, */*',
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36",
-        "Custom-Source": "KyoukaOfficial",
-        "Content-Type": "application/json",
+        # "accept": 'application/json, text/plain, */*',
+        # "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36",
+        # "Custom-Source": "KyoukaOfficial",
+        # "Content-Type": "application/json",
         "Origin": "https://kyouka.kengxxiao.com/",
-        "Sec-Ch-Ua": "Chromium",
-        "Sec-Fetch-Site": "cross-site",
-        "Sec-Fetch-Mode": "cors",
-        "Sec-Fetch-Dest": "empty",
+        # "Sec-Ch-Ua": "Chromium",
+        # "Sec-Fetch-Site": "cross-site",
+        # "Sec-Fetch-Mode": "cors",
+        # "Sec-Fetch-Dest": "empty",
         "Referer": "https://kyouka.kengxxiao.com/",
-        "Accept-Language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7",
-        "Accept": "application/json, text/plain, */*",
-        "Accept-Encoding": "gzip, deflate, br",
-        "Connection": "close",
+        # "Accept-Language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7",
+        # "Accept": "application/json, text/plain, */*",
+        # "Accept-Encoding": "gzip, deflate, br",
+        # "Connection": "close",
         "x-nonce": s,
         "x-timestamp": t,
         "x-sign": f"SIGv1.0|{r}"
     }
-    conn = requests.session()
     request = {
         "name": "",
         "leaderName": "",
@@ -55,9 +55,10 @@ def bilipage(page):
         "onlyRank": False
     }
     try:
-        resp = conn.post(url=urlroot + '/clan/rankSearch/', headers=default_headers, json=request)
-        ret = json.loads(resp.content.decode())
-        return ret["data"]
+        async with aiohttp.ClientSession() as session:
+            async with session.post(urlroot + '/clan/rankSearch/', json=request, headers=default_headers) as resp:
+                res = await resp.json()
+                return res["data"]["clans"]
     except Exception:
         return False
 
@@ -88,7 +89,7 @@ def binarySearch(arr, left, right, x):
     if right >= left:
         mid = int(left + (right - left)/2)
         if arr[mid] == x:
-            return mid
+            return mid + 1
         elif arr[mid] > x:
             return binarySearch(arr, mid+1, right, x)
         else:
@@ -116,5 +117,4 @@ def cal_rank():
 
 
 if __name__ == '__main__':
-    data = bilipage(400)
-    cal_rank()
+    print(binarySearch([10,9,8,7,6,5,4], 0, 8, 7))
